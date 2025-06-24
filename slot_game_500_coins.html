@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>777CE Slot Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #111;
+      color: #fff;
+    }
+    .slot-container {
+      margin-top: 50px;
+    }
+    .reels {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .message {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    .reward-box {
+      margin-top: 30px;
+      background-color: #222;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎰 Welcome to 777CE Slot Game</h1>
+  <div class="slot-container">
+    <div class="reels" id="reels">🍒 🍋 🍊</div>
+    <button onclick="spin()">Spin</button>
+    <p>Balance: <span id="balance">500</span> coins</p>
+
+    <input type="number" id="depositAmount" placeholder="Enter deposit amount" />
+    <button onclick="deposit()">Deposit</button>
+
+    <button onclick="withdraw()" id="withdrawBtn" disabled>Withdraw</button>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <div class="reward-box">
+    <h2>🎁 Hourly Reward</h2>
+    <p>You can claim 15 coins every hour!</p>
+    <button onclick="claimHourlyReward()" id="rewardBtn">Claim Reward</button>
+    <p id="rewardStatus"></p>
+  </div>
+
+  <div class="reward-box">
+    <h2>🤝 Invite a Friend</h2>
+    <p>Invite a friend and get 800 coins!</p>
+    <button onclick="inviteFriend()">Invite</button>
+    <p id="inviteStatus"></p>
+  </div>
+
+  <script>
+    let balance = 500;
+    let hasDeposited = false;
+    const symbols = ["🍒", "🍋", "🍊", "⭐", "7"];
+    let lastClaimTime = 0;
+    let hasInvited = false;
+
+    function getRandomSymbol() {
+      return symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    function spin() {
+      if (balance < 10) {
+        document.getElementById("message").textContent = "Not enough coins to spin!";
+        return;
+      }
+
+      balance -= 10;
+      const reel1 = getRandomSymbol();
+      const reel2 = getRandomSymbol();
+      const reel3 = getRandomSymbol();
+
+      document.getElementById("reels").textContent = `${reel1} ${reel2} ${reel3}`;
+
+      if (reel1 === reel2 && reel2 === reel3) {
+        let reward = 100;
+        balance += reward;
+        document.getElementById("message").textContent = `Jackpot! You win ${reward} coins!`;
+      } else if (reel1 === reel2 || reel2 === reel3 || reel1 === reel3) {
+        let reward = 20;
+        balance += reward;
+        document.getElementById("message").textContent = `Nice! You win ${reward} coins.`;
+      } else {
+        document.getElementById("message").textContent = "Try again!";
+      }
+
+      document.getElementById("balance").textContent = balance;
+    }
+
+    function deposit() {
+      const amount = parseInt(document.getElementById("depositAmount").value);
+      if (isNaN(amount) || amount <= 0) {
+        alert("Enter a valid deposit amount.");
+        return;
+      }
+
+      balance += amount;
+      hasDeposited = true;
+      document.getElementById("balance").textContent = balance;
+      document.getElementById("message").textContent = `Deposited ${amount} coins.`;
+      document.getElementById("withdrawBtn").disabled = false;
+    }
+
+    function withdraw() {
+      if (!hasDeposited) {
+        document.getElementById("message").textContent = "🚫 You must deposit before withdrawing.";
+        return;
+      }
+
+      let amount = 50;
+      if (balance < amount) {
+        document.getElementById("message").textContent = "Not enough balance to withdraw.";
+        return;
+      }
+
+      balance -= amount;
+      document.getElementById("balance").textContent = balance;
+      document.getElementById("message").textContent = `✅ You withdrew ${amount} coins.`;
+    }
+
+    function claimHourlyReward() {
+      const now = Date.now();
+      if (now - lastClaimTime >= 3600000) {
+        balance += 15;
+        lastClaimTime = now;
+        document.getElementById("balance").textContent = balance;
+        document.getElementById("rewardStatus").textContent = "✅ You claimed 15 coins! Come back in 1 hour.";
+      } else {
+        const minutes = Math.ceil((3600000 - (now - lastClaimTime)) / 60000);
+        document.getElementById("rewardStatus").textContent = `⏳ Please wait ${minutes} more minutes to claim again.`;
+      }
+    }
+
+    function inviteFriend() {
+      if (!hasInvited) {
+        balance += 800;
+        hasInvited = true;
+        document.getElementById("balance").textContent = balance;
+        document.getElementById("inviteStatus").textContent = "🎉 Friend invited successfully! You earned 800 coins.";
+      } else {
+        document.getElementById("inviteStatus").textContent = "✅ You already invited a friend.";
+      }
+    }
+  </script>
+</body>
+</html>
